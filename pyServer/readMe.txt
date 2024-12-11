@@ -1,0 +1,1 @@
+code to communicate between the raspberry pi and a computer on the same local network
