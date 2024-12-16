@@ -47,7 +47,7 @@ def process_frame(frame, window_name):
     # Check for user input to save the frame
     key = cv2.waitKey(1) & 0xFF
     if key == ord('t'):
-        filename = f"{window_name}_frameN{saved_frame_counter}.jpg"
+        filename = f"{window_name}_line_PBimgN{saved_frame_counter}.jpg"
         cv2.imwrite(filename, frame)
         print(f"Frame saved as: {filename}")
         saved_frame_counter += 1

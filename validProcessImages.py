@@ -3,9 +3,9 @@ import numpy as np
 
 # Global Variables
 root = "iot_camera_image_detection/test_data/"
-image_paths = ["frameN3.jpg", "frameN4.jpg","frameN5.jpg", "frameN6.jpg", "frameN7.jpg", "frameN8.jpg" ]
-lower_blue = np.array([10, 20, 130])  # Lower HSV threshold for blue
-upper_blue = np.array([70, 70, 190])  # Upper HSV threshold for blue
+image_paths = ["Camera 1_PBimgN3.jpg", "Camera 1_imgN3.jpg","Camera 1_imgN5.jpg", "Camera 1_imgN6.jpg", "Camera 1_imgN7.jpg", "Camera 1_imgN1.jpg" ]
+lower_blue = np.array([15, 10, 110])  # Lower HSV threshold for blue
+upper_blue = np.array([65, 30, 260])  # Upper HSV threshold for blue
 
 
 def preprocess_image(image):
@@ -142,7 +142,9 @@ def find_and_analyze_contours(edges, blue_contour, original):
             box_center = (x + w // 2, y + h // 2)
 
             # Check if the box is inside the blue area
-            inside_blue = cv2.pointPolygonTest(blue_contour, box_center, False) >= 0 if blue_contour else False
+            # inside_blue = cv2.pointPolygonTest(blue_contour, box_center, False) >= 0 if blue_contour else False
+            inside_blue = cv2.pointPolygonTest(blue_contour, box_center, False) >= 0 if blue_contour is not None and len(blue_contour) > 0 else False
+
 
             color = (0, 255, 0) if inside_blue else (0, 0, 255)  # Green if inside, Red if outside
             cv2.rectangle(result_image, (x, y), (x + w, y + h), color, 2)
@@ -179,8 +181,8 @@ def process_image(image_path):
     opened_mask = opening(mask_blue)
 
     # Define crop coordinates
-    start_y, end_y = 18, 225
-    start_x, end_x = 15, 203
+    start_y, end_y = 5, 240
+    start_x, end_x = 15, 290
     # Create a black image of the same size as the opened_mask
     cropped_img = np.zeros_like(opened_mask)
     # Copy the pixels within the crop to their positions in the black image

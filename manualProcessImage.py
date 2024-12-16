@@ -2,7 +2,7 @@ import cv2
 import numpy as np
 
 # Global Variables
-image_paths = ["iot_camera_image_detection/test_data/frameN3.jpg", "iot_camera_image_detection/test_data/frameN4.jpg", "iot_camera_image_detection/test_data/frameN6.jpg", "iot_camera_image_detection/test_data/frameN7.jpg"]
+image_paths = ["iot_camera_image_detection/test_data/Camera 1_line_imgN3.jpg", "iot_camera_image_detection/test_data/Camera 1_imgN4.jpg", "iot_camera_image_detection/test_data/Camera 1_imgN6.jpg", "iot_camera_image_detection/test_data/Camera 1_imgN7.jpg"]
 color_modes = ["BGR", "HSV", "GRAY"]  # Supported color modes
 current_mode_index = 0  # Current color mode index
 edge_detection_enabled = False  # Flag for edge detection
