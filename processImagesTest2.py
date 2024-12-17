@@ -5,6 +5,25 @@ import numpy as np
 lower_blue = np.array([8, 8, 110])  # Lower HSV threshold for blue
 upper_blue = np.array([65, 50, 260])  # Upper HSV threshold for blue
 
+def biggest_area_dimensions(mask):
+    """
+    Find the dimensions (width and height) of the bounding rectangle of the largest contour in the binary mask.
+    Returns the width and height of the largest area.
+    """
+    # Find all contours
+    contours, _ = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+    
+    if not contours:
+        return 0, 0  # Return 0,0 if no contours are found
+
+    # Find the largest contour by area
+    largest_contour = max(contours, key=cv2.contourArea)
+
+    # Get the bounding rectangle of the largest contour
+    x, y, width, height = cv2.boundingRect(largest_contour)
+
+    return width, height
+
 def filter_image(image):
     """
     Processes the input image to filter by blue color and keep areas larger than a threshold.
@@ -82,6 +101,28 @@ def check_boxes(image_path):
     # Find contours for the boxes
     box_contours, _ = cv2.findContours(box_mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
 
+        # Label connected regions
+        # Create a horizontal rectangular kernel for dilation
+    horizontal_kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (20, 5))  # Width=20, Height=1
+    # Apply dilation with the horizontal kernel
+    dilation = cv2.dilate(box_mask, horizontal_kernel, iterations=1)
+    num_labels, labeled_image = cv2.connectedComponents(dilation)
+    # cv2.imshow("Ouvert", dilation)
+
+    # Get the size of a specific region
+    # region_size = area_size(filtered_mask)
+    largest_width, largest_height = biggest_area_dimensions(dilation)
+    # Determine the threshold for nbCarton based on largest_height
+    if largest_height < 90:
+        nbCarton = 1
+    elif 91 <= largest_height <= 180:
+        nbCarton = 2
+    else:  # largest_height > 181
+        nbCarton = 3
+    print(f"Largest Area - Width: {largest_width}, Height: {largest_height}, nombre de cartons : {nbCarton} ")
+
+    print(f"Number of regions: {num_labels}")
+
     # Check if each box is outside the blue area based on the bounding rectangle
     for contour in box_contours:
         box_x, box_y, box_w, box_h = cv2.boundingRect(contour)
@@ -128,10 +169,14 @@ def check_boxes(image_path):
     cv2.waitKey(0)
     cv2.destroyAllWindows()
 
-# Test the function
-root = "iot_camera_image_detection/test_data/test/"
-image_paths = ["Camera 1_line_PBimgN5.jpg","Camera 1_line_PBimgN6.jpg", "Camera 1_line_PBimgN7.jpg", "Camera 1_line_PBimgN8.jpg", "Camera 1_line_PBimgN9.jpg", "Camera 1_line_PBimgN1.jpg", "Camera 1_line_PBimgN2.jpg", "Camera 1_line_PBimgN3.jpg", "Camera 1_line_PBimgN4.jpg"] 
-            #    "Camera 1_line_PBimgN4.jpg","Camera 1_2PBimgN3.jpg", "Camera 1_imgN3.jpg","Camera 1_imgN5.jpg", "Camera 1_imgN6.jpg", "Camera 1_imgN7.jpg", "Camera 1_imgN1.jpg" ]
+# Protect the code that runs automatically
+if __name__ == "__main__":
+    # Test the function
+    root = "iot_camera_image_detection/test_data/test/"
+    image_paths = ["Camera 1_line_PBimgN5.jpg","Camera 1_line_PBimgN6.jpg", "Camera 1_line_PBimgN7.jpg", "Camera 1_line_PBimgN8.jpg", "Camera 1_line_PBimgN9.jpg", "Camera 1_line_PBimgN1.jpg", "Camera 1_line_PBimgN2.jpg", "Camera 1_line_PBimgN3.jpg", "Camera 1_line_PBimgN4.jpg"] 
+                #    "Camera 1_line_PBimgN4.jpg","Camera 1_2PBimgN3.jpg", "Camera 1_imgN3.jpg","Camera 1_imgN5.jpg", "Camera 1_imgN6.jpg", "Camera 1_imgN7.jpg", "Camera 1_imgN1.jpg" ]
 
-for path in image_paths:
-    check_boxes(root+path)
+    # check_boxes("iot_camera_image_detection/test_data/Camera 1_2PBimgN8.jpg")
+
+    for path in image_paths:
+        check_boxes(root+path)
